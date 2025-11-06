@@ -1,7 +1,10 @@
+# app.py
 from flask import Flask, jsonify, request
 from models import db, Agendamento, Cientista
 from datetime import datetime
-import logging, json, os
+import logging, json, os, requests
+
+COORDENADOR_URL = "http://127.0.0.1:3000"  # Porta do coordenador
 
 # Configuração básica
 app = Flask(__name__)
@@ -39,10 +42,9 @@ def log_auditoria(event_type, details):
 
 @app.route('/')
 def home():
-    return jsonify({"message": "Serviço de Agendamento ativo!"})
+    return jsonify({"message": "Serviço de Agendamento ativo e coordenado!"})
 
 # === CRUD de Cientistas ===
-
 @app.route('/cientistas', methods=['POST'])
 def criar_cientista():
     data = request.get_json()
@@ -62,94 +64,62 @@ def obter_cientista(id):
     cientista = Cientista.query.get_or_404(id)
     return jsonify(cientista.to_dict())
 
-@app.route('/cientistas/<int:id>', methods=['PUT'])
-def atualizar_cientista(id):
-    cientista = Cientista.query.get_or_404(id)
-    data = request.get_json()
-    cientista.nome = data.get('nome', cientista.nome)
-    cientista.instituicao = data.get('instituicao', cientista.instituicao)
-    db.session.commit()
-    logger.info(f"Cientista {id} atualizado")
-    return jsonify(cientista.to_dict())
-
-@app.route('/cientistas/<int:id>', methods=['DELETE'])
-def deletar_cientista(id):
-    cientista = Cientista.query.get_or_404(id)
-    db.session.delete(cientista)
-    db.session.commit()
-    logger.info(f"Cientista {id} deletado")
-    return '', 204
-
-# === CRUD de Agendamentos ===
+# === CRUD de Agendamentos com coordenação ===
 
 @app.route('/agendamentos', methods=['POST'])
 def criar_agendamento():
-    logger.info("Requisição recebida para POST /agendamentos")
     data = request.get_json()
     cientista_id = data['cientista_id']
     horario_inicio = data['horario_inicio_utc']
 
-    novo = Agendamento(cientista_id=cientista_id, horario_inicio_utc=horario_inicio)
-    db.session.add(novo)
-    db.session.commit()
-    logger.info("Salvando novo agendamento no BD")
+    resource_id = f"agendamento_{cientista_id}_{horario_inicio}"
+    logger.info(f"Tentando adquirir lock para o recurso {resource_id}")
 
-    log_auditoria("AGENDAMENTO_CRIADO", {
-        "agendamento_id": novo.id,
-        "cientista_id": novo.cientista_id,
-        "horario_inicio_utc": novo.horario_inicio_utc
-    })
+    try:
+        # === Solicita lock ao Coordenador ===
+        resp = requests.post(f"{COORDENADOR_URL}/lock", json={"resource_id": resource_id}, timeout=5)
+        if resp.status_code == 409:
+            logger.info(f"Falha ao adquirir lock, recurso ocupado ({resource_id})")
+            return jsonify({"status": "falha", "motivo": "recurso_ocupado"}), 409
 
-    return jsonify(novo.to_dict()), 201
+        if resp.status_code != 200:
+            logger.info(f"Erro inesperado ao tentar adquirir lock ({resp.status_code})")
+            return jsonify({"status": "falha", "motivo": "erro_coordenador"}), 500
+
+        logger.info(f"Lock adquirido com sucesso para o recurso {resource_id}")
+
+        # === Cria o agendamento no BD ===
+        novo = Agendamento(cientista_id=cientista_id, horario_inicio_utc=horario_inicio)
+        db.session.add(novo)
+        db.session.commit()
+        logger.info("Salvando novo agendamento no BD")
+
+        log_auditoria("AGENDAMENTO_CRIADO", {
+            "agendamento_id": novo.id,
+            "cientista_id": novo.cientista_id,
+            "horario_inicio_utc": novo.horario_inicio_utc
+        })
+
+        return jsonify(novo.to_dict()), 201
+
+    finally:
+        # === Libera lock ===
+        try:
+            requests.post(f"{COORDENADOR_URL}/unlock", json={"resource_id": resource_id}, timeout=5)
+            logger.info(f"Lock liberado para o recurso {resource_id}")
+        except Exception as e:
+            logger.info(f"Falha ao liberar lock ({resource_id}): {e}")
 
 @app.route('/agendamentos', methods=['GET'])
 def listar_agendamentos():
     ags = Agendamento.query.all()
     return jsonify([a.to_dict() for a in ags])
 
-@app.route('/agendamentos/<int:id>', methods=['GET'])
-def obter_agendamento(id):
-    ag = Agendamento.query.get_or_404(id)
-    return jsonify(ag.to_dict())
-
-@app.route('/agendamentos/<int:id>', methods=['PUT'])
-def atualizar_agendamento(id):
-    ag = Agendamento.query.get_or_404(id)
-    data = request.get_json()
-    ag.status = data.get('status', ag.status)
-    db.session.commit()
-    logger.info(f"Agendamento {id} atualizado")
-    return jsonify(ag.to_dict())
-
-@app.route('/agendamentos/<int:id>', methods=['DELETE'])
-def deletar_agendamento(id):
-    ag = Agendamento.query.get_or_404(id)
-    db.session.delete(ag)
-    db.session.commit()
-    logger.info(f"Agendamento {id} deletado")
-    return '', 204
-
-@app.route('/agendamentos/<int:id>/cancelar', methods=['POST'])
-def cancelar_agendamento(id):
-    ag = Agendamento.query.get_or_404(id)
-    ag.status = "CANCELADO"
-    db.session.commit()
-    logger.info(f"Agendamento {id} cancelado")
-
-    log_auditoria("AGENDAMENTO_CANCELADO", {
-        "agendamento_id": ag.id,
-        "cientista_id": ag.cientista_id
-    })
-
-    return jsonify(ag.to_dict())
-
-# === ENDPOINT DE TEMPO ===
 @app.route('/time', methods=['GET'])
 def get_time():
     now = datetime.utcnow().isoformat() + "Z"
     logger.info(f"GET /time chamado. Retornando {now}")
     return jsonify({"server_time_utc": now})
 
-# === MAIN ===
 if __name__ == '__main__':
     app.run(debug=True)

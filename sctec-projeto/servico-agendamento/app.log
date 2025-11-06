@@ -1,0 +1,48 @@
+INFO:2025-11-06 18:39:36,827:werkzeug:[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+INFO:2025-11-06 18:39:36,827:werkzeug:[33mPress CTRL+C to quit[0m
+INFO:2025-11-06 18:39:36,828:werkzeug: * Restarting with stat
+WARNING:2025-11-06 18:39:37,318:werkzeug: * Debugger is active!
+INFO:2025-11-06 18:39:37,319:werkzeug: * Debugger PIN: 151-840-978
+INFO:2025-11-06 18:40:06,295:servico-agendamento:Tentando adquirir lock para o recurso agendamento_1_2025-12-01T03:00:00Z
+INFO:2025-11-06 18:40:06,300:servico-agendamento:Tentando adquirir lock para o recurso agendamento_1_2025-12-01T03:00:00Z
+INFO:2025-11-06 18:40:06,306:servico-agendamento:Tentando adquirir lock para o recurso agendamento_1_2025-12-01T03:00:00Z
+INFO:2025-11-06 18:40:06,307:servico-agendamento:Tentando adquirir lock para o recurso agendamento_1_2025-12-01T03:00:00Z
+INFO:2025-11-06 18:40:06,308:servico-agendamento:Tentando adquirir lock para o recurso agendamento_1_2025-12-01T03:00:00Z
+INFO:2025-11-06 18:40:06,312:servico-agendamento:Tentando adquirir lock para o recurso agendamento_1_2025-12-01T03:00:00Z
+INFO:2025-11-06 18:40:06,314:servico-agendamento:Tentando adquirir lock para o recurso agendamento_1_2025-12-01T03:00:00Z
+INFO:2025-11-06 18:40:06,315:servico-agendamento:Tentando adquirir lock para o recurso agendamento_1_2025-12-01T03:00:00Z
+INFO:2025-11-06 18:40:06,317:servico-agendamento:Tentando adquirir lock para o recurso agendamento_1_2025-12-01T03:00:00Z
+INFO:2025-11-06 18:40:06,318:servico-agendamento:Tentando adquirir lock para o recurso agendamento_1_2025-12-01T03:00:00Z
+INFO:2025-11-06 18:40:06,331:servico-agendamento:Lock adquirido com sucesso para o recurso agendamento_1_2025-12-01T03:00:00Z
+INFO:2025-11-06 18:40:06,333:servico-agendamento:Falha ao adquirir lock, recurso ocupado (agendamento_1_2025-12-01T03:00:00Z)
+INFO:2025-11-06 18:40:06,345:servico-agendamento:Falha ao adquirir lock, recurso ocupado (agendamento_1_2025-12-01T03:00:00Z)
+INFO:2025-11-06 18:40:06,346:servico-agendamento:Falha ao adquirir lock, recurso ocupado (agendamento_1_2025-12-01T03:00:00Z)
+INFO:2025-11-06 18:40:06,346:servico-agendamento:Falha ao adquirir lock, recurso ocupado (agendamento_1_2025-12-01T03:00:00Z)
+INFO:2025-11-06 18:40:06,354:servico-agendamento:Falha ao adquirir lock, recurso ocupado (agendamento_1_2025-12-01T03:00:00Z)
+INFO:2025-11-06 18:40:06,355:servico-agendamento:Falha ao adquirir lock, recurso ocupado (agendamento_1_2025-12-01T03:00:00Z)
+INFO:2025-11-06 18:40:06,355:servico-agendamento:Falha ao adquirir lock, recurso ocupado (agendamento_1_2025-12-01T03:00:00Z)
+INFO:2025-11-06 18:40:06,356:servico-agendamento:Falha ao adquirir lock, recurso ocupado (agendamento_1_2025-12-01T03:00:00Z)
+INFO:2025-11-06 18:40:06,356:servico-agendamento:Falha ao adquirir lock, recurso ocupado (agendamento_1_2025-12-01T03:00:00Z)
+INFO:2025-11-06 18:40:06,364:servico-agendamento:Lock liberado para o recurso agendamento_1_2025-12-01T03:00:00Z
+INFO:2025-11-06 18:40:06,374:werkzeug:127.0.0.1 - - [06/Nov/2025 18:40:06] "[31m[1mPOST /agendamentos HTTP/1.1[0m" 409 -
+INFO:2025-11-06 18:40:06,376:servico-agendamento:Lock liberado para o recurso agendamento_1_2025-12-01T03:00:00Z
+INFO:2025-11-06 18:40:06,370:servico-agendamento:Lock liberado para o recurso agendamento_1_2025-12-01T03:00:00Z
+INFO:2025-11-06 18:40:06,378:servico-agendamento:Lock liberado para o recurso agendamento_1_2025-12-01T03:00:00Z
+INFO:2025-11-06 18:40:06,372:servico-agendamento:Lock liberado para o recurso agendamento_1_2025-12-01T03:00:00Z
+INFO:2025-11-06 18:40:06,380:werkzeug:127.0.0.1 - - [06/Nov/2025 18:40:06] "[31m[1mPOST /agendamentos HTTP/1.1[0m" 409 -
+INFO:2025-11-06 18:40:06,382:werkzeug:127.0.0.1 - - [06/Nov/2025 18:40:06] "[31m[1mPOST /agendamentos HTTP/1.1[0m" 409 -
+INFO:2025-11-06 18:40:06,382:werkzeug:127.0.0.1 - - [06/Nov/2025 18:40:06] "[31m[1mPOST /agendamentos HTTP/1.1[0m" 409 -
+INFO:2025-11-06 18:40:06,381:servico-agendamento:Lock liberado para o recurso agendamento_1_2025-12-01T03:00:00Z
+INFO:2025-11-06 18:40:06,385:servico-agendamento:Lock liberado para o recurso agendamento_1_2025-12-01T03:00:00Z
+INFO:2025-11-06 18:40:06,384:servico-agendamento:Salvando novo agendamento no BD
+INFO:2025-11-06 18:40:06,387:servico-agendamento:Lock liberado para o recurso agendamento_1_2025-12-01T03:00:00Z
+INFO:2025-11-06 18:40:06,388:werkzeug:127.0.0.1 - - [06/Nov/2025 18:40:06] "[31m[1mPOST /agendamentos HTTP/1.1[0m" 409 -
+INFO:2025-11-06 18:40:06,389:servico-agendamento:Lock liberado para o recurso agendamento_1_2025-12-01T03:00:00Z
+INFO:2025-11-06 18:40:06,387:werkzeug:127.0.0.1 - - [06/Nov/2025 18:40:06] "[31m[1mPOST /agendamentos HTTP/1.1[0m" 409 -
+INFO:2025-11-06 18:40:06,396:werkzeug:127.0.0.1 - - [06/Nov/2025 18:40:06] "[31m[1mPOST /agendamentos HTTP/1.1[0m" 409 -
+WARNING:2025-11-06 18:40:06,399:servico-agendamento:{"timestamp_utc": "2025-11-06T18:40:06.399303Z", "level": "AUDIT", "event_type": "AGENDAMENTO_CRIADO", "service": "servico-agendamento", "details": {"agendamento_id": 1, "cientista_id": 1, "horario_inicio_utc": "2025-12-01T03:00:00Z"}}
+INFO:2025-11-06 18:40:06,400:werkzeug:127.0.0.1 - - [06/Nov/2025 18:40:06] "[31m[1mPOST /agendamentos HTTP/1.1[0m" 409 -
+INFO:2025-11-06 18:40:06,400:werkzeug:127.0.0.1 - - [06/Nov/2025 18:40:06] "[31m[1mPOST /agendamentos HTTP/1.1[0m" 409 -
+INFO:2025-11-06 18:40:06,409:servico-agendamento:Lock liberado para o recurso agendamento_1_2025-12-01T03:00:00Z
+INFO:2025-11-06 18:40:06,410:werkzeug:127.0.0.1 - - [06/Nov/2025 18:40:06] "[35m[1mPOST /agendamentos HTTP/1.1[0m" 201 -

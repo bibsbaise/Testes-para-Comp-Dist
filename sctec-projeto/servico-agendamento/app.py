@@ -4,7 +4,9 @@ from models import db, Agendamento, Cientista
 from datetime import datetime
 import logging, json, os, requests
 
+
 COORDENADOR_URL = "http://127.0.0.1:3000"  # Porta do coordenador
+
 
 # Configuração básica
 app = Flask(__name__)
@@ -12,9 +14,11 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///db.sqlite3'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db.init_app(app)
 
+
 # Criar o banco na primeira execução
 with app.app_context():
     db.create_all()
+
 
 # === CONFIGURAÇÃO DE LOGGING ===
 log_file = 'app.log'
@@ -28,6 +32,7 @@ logging.basicConfig(
 )
 logger = logging.getLogger('servico-agendamento')
 
+
 def log_auditoria(event_type, details):
     registro = {
         "timestamp_utc": datetime.utcnow().isoformat() + "Z",
@@ -38,11 +43,14 @@ def log_auditoria(event_type, details):
     }
     logger.warning(json.dumps(registro))
 
+
 # === ROTAS ===
+
 
 @app.route('/')
 def home():
     return jsonify({"message": "Serviço de Agendamento ativo e coordenado!"})
+
 
 # === CRUD de Cientistas ===
 @app.route('/cientistas', methods=['POST'])
@@ -54,17 +62,21 @@ def criar_cientista():
     logger.info("Cientista criado com sucesso")
     return jsonify(novo.to_dict()), 201
 
+
 @app.route('/cientistas', methods=['GET'])
 def listar_cientistas():
     cientistas = Cientista.query.all()
     return jsonify([c.to_dict() for c in cientistas])
+
 
 @app.route('/cientistas/<int:id>', methods=['GET'])
 def obter_cientista(id):
     cientista = Cientista.query.get_or_404(id)
     return jsonify(cientista.to_dict())
 
+
 # === CRUD de Agendamentos com coordenação ===
+
 
 @app.route('/agendamentos', methods=['POST'])
 def criar_agendamento():
@@ -72,8 +84,10 @@ def criar_agendamento():
     cientista_id = data['cientista_id']
     horario_inicio = data['horario_inicio_utc']
 
+
     resource_id = f"agendamento_{cientista_id}_{horario_inicio}"
     logger.info(f"Tentando adquirir lock para o recurso {resource_id}")
+
 
     try:
         # === Solicita lock ao Coordenador ===
@@ -82,11 +96,14 @@ def criar_agendamento():
             logger.info(f"Falha ao adquirir lock, recurso ocupado ({resource_id})")
             return jsonify({"status": "falha", "motivo": "recurso_ocupado"}), 409
 
+
         if resp.status_code != 200:
             logger.info(f"Erro inesperado ao tentar adquirir lock ({resp.status_code})")
             return jsonify({"status": "falha", "motivo": "erro_coordenador"}), 500
 
+
         logger.info(f"Lock adquirido com sucesso para o recurso {resource_id}")
+
 
         # === Cria o agendamento no BD ===
         novo = Agendamento(cientista_id=cientista_id, horario_inicio_utc=horario_inicio)
@@ -94,13 +111,16 @@ def criar_agendamento():
         db.session.commit()
         logger.info("Salvando novo agendamento no BD")
 
+
         log_auditoria("AGENDAMENTO_CRIADO", {
             "agendamento_id": novo.id,
             "cientista_id": novo.cientista_id,
             "horario_inicio_utc": novo.horario_inicio_utc
         })
 
+
         return jsonify(novo.to_dict()), 201
+
 
     finally:
         # === Libera lock ===
@@ -110,16 +130,19 @@ def criar_agendamento():
         except Exception as e:
             logger.info(f"Falha ao liberar lock ({resource_id}): {e}")
 
+
 @app.route('/agendamentos', methods=['GET'])
 def listar_agendamentos():
     ags = Agendamento.query.all()
     return jsonify([a.to_dict() for a in ags])
+
 
 @app.route('/time', methods=['GET'])
 def get_time():
     now = datetime.utcnow().isoformat() + "Z"
     logger.info(f"GET /time chamado. Retornando {now}")
     return jsonify({"server_time_utc": now})
+
 
 if __name__ == '__main__':
     app.run(debug=True)

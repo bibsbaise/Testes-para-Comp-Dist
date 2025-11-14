@@ -13,7 +13,7 @@ app.post("/lock", (req, res) => {
     console.log(`Recurso ${resource_id} já está em uso, negando lock`);
     return res.status(409).json({
       status: "recurso_ocupado",
-      _links: { self: "/lock" }
+      _links: { self: "/lock" },
     });
   }
 
@@ -21,7 +21,7 @@ app.post("/lock", (req, res) => {
   console.log(`Lock concedido para o recurso ${resource_id}`);
   return res.status(200).json({
     status: "lock_concedido",
-    _links: { unlock: "/unlock" }
+    _links: { unlock: "/unlock" },
   });
 });
 
@@ -38,7 +38,7 @@ app.post("/unlock", (req, res) => {
 
   return res.status(200).json({
     status: "lock_liberado",
-    _links: { self: "/unlock", request_lock: "/lock" }
+    _links: { self: "/unlock", request_lock: "/lock" },
   });
 });
 
